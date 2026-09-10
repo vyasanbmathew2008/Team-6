@@ -268,3 +268,15 @@ print(f"Target variable          : {target_column}")
 if target_column in df.columns:
     print(f"Number of target classes : {df[target_column].nunique()}")
 ```
+
+---
+
+## Conclusion
+
+The healthcare disease prediction dataset was examined for exact duplicate records and potentially irrelevant or unsuitable columns.
+
+Exact duplicate rows were identified and documented without modifying the original dataset. Several columns, including `Name`, `Doctor`, `Hospital`, and `Room Number`, may have limited generalizable value or high cardinality and should be reviewed during the preprocessing stage.
+
+Other variables, such as `Discharge Date`, `Medication`, `Test Results`, and `Billing Amount`, may contain information that is only available after admission or during treatment. Their suitability should therefore be evaluated according to the intended prediction timing to avoid data leakage.
+
+The findings from this analysis will support subsequent data cleaning, feature selection, preprocessing, and machine-learning model development.
