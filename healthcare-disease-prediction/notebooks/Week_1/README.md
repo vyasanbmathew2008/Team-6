@@ -20,8 +20,8 @@ The notebooks are designed to run in **Google Colab** and the corresponding Mark
 
 ### 🔗 Dataset
 
-[📊 Healthcare Dataset](../../dataset/healthcare_dataset.csv)
+[<img src="https://img.shields.io/badge/GitHub-Dataset-181717?logo=github&logoColor=white" alt="GitHub Dataset">](../../dataset/healthcare_dataset.csv)
 
 ### 🏠 Main Project
 
-[Healthcare Disease Prediction](../../README.md)
+[<img src="https://img.shields.io/badge/GitHub-Main%20Project-181717?logo=github&logoColor=white" alt="GitHub Main Project">](../../README.md)
