@@ -27,14 +27,19 @@
 
 ---
 
-## Project Objectives
+Project Objectives
 
-- [x] **Collect & Explore:** Gather and understand the structure of the healthcare dataset.
-- [ ] **Systematic Preprocessing:** Build a robust data-cleaning and preprocessing pipeline.
-- [ ] **Model Development:** Train multiple machine-learning algorithms for disease prediction.
-- [ ] **Evaluate & Compare:** Benchmark models using standardized metrics and select the strongest model.
-- [ ] **Deployment:** Deploy the trained model through a scalable API or web interface.
-- [ ] **GenAI Enhancement:** Integrate Generative AI to provide user-friendly explanations and contextual recommendations.
+- [x] Collect & Explore: Gather and understand the structure of the healthcare dataset, identify data types, missing values, duplicates, categorical and numerical features, and define "Medical Condition" as the target variable for disease prediction.
+
+- [ ] Systematic Preprocessing: Build a robust data-cleaning and preprocessing pipeline, including handling missing values, duplicates, inconsistent text formatting, date conversion, categorical encoding, numerical feature processing, and appropriate feature selection.
+
+- [ ] Model Development: Train and compare multiple machine-learning algorithms to predict the patient's "Medical Condition" from relevant healthcare and admission features.
+
+- [ ] Evaluate & Compare: Benchmark the trained models using standardized evaluation metrics such as accuracy, precision, recall, F1-score, and confusion matrix, then select the strongest model.
+
+- [ ] Deployment: Deploy the selected disease-prediction model through a user-friendly Streamlit web application with an appropriate prediction interface.
+
+- [ ] GenAI Enhancement: Integrate the Gemini API to provide user-friendly explanations of the predicted disease, relevant contextual information, and appropriate healthcare recommendations while clearly presenting the output as supportive information rather than a medical diagnosis.
 
 ---
 
