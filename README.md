@@ -59,7 +59,7 @@ healthcare-disease-prediction/
 │   │   ├── 02_Duplicates_Irrelevant_Columns.ipynb
 │   │   ├── 03_Categorical_Numerical_Analysis.ipynb
 │   │   ├── 04_Exploratory_Data_Analysis.ipynb
-│   │   └── 05_Initial_Cleaning_Dataset_Documentation.ipynb
+│   │   └── 05_Initial_Data_Preprocessing_Dataset_Documentation.ipynb
 │   │
 │   ├── Week_2/
 │   │   └── week2_modelling.ipynb
@@ -74,7 +74,7 @@ healthcare-disease-prediction/
 │   │   ├── 02_Duplicates_Irrelevant_Columns.md
 │   │   ├── 03_Categorical_Numerical_Analysis.md
 │   │   ├── 04_Exploratory_Data_Analysis.md
-│   │   └── 05_Initial_Cleaning_Dataset_Documentation.md
+│   │   └── 05_Initial_Data_Preprocessing_Dataset_Documentation.md
 │   │
 │   ├── Week_2/
 │   │   └── week2_modelling.md
@@ -114,7 +114,7 @@ healthcare-disease-prediction/
 - [ ] Identify duplicate records & irrelevant columns
 - [ ] Analyze categorical and numerical features
 - [ ] Perform exploratory data analysis (EDA)
-- [ ] Perform initial data cleaning & Document dataset characteristics
+- [ ] Perform initial data preprocessing & Document dataset characteristics
 
 #### Week 1 Deliverables
 
@@ -122,7 +122,6 @@ healthcare-disease-prediction/
 - [ ] Dataset description
 - [ ] Initial EDA report
 - [ ] Initial preprocessing notebook or script
-- [ ] Cleaned dataset
 - [ ] Initial preprocessing documentation
 
 ---
