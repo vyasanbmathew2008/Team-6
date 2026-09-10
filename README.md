@@ -6,9 +6,9 @@ This internship project focuses on developing a Machine Learning-based Healthcar
 
 ---
 
-🔗 Dataset & Data Files
+##🔗 Dataset & Data Files
 
-<bold>Original Dataset</bold>
+##Original Dataset
 
 The original dataset used for this project can be accessed here:
 
@@ -18,20 +18,20 @@ Dataset URL:
 The dataset used in the project is available in CSV format on GitHub:
 "[GitHub CSV URL]"
 
-Preprocessed Dataset
+##Preprocessed Dataset
 
 The cleaned and preprocessed dataset generated during the project:
 "[Preprocessed Dataset URL]"
 
 ---
 
-📅 Project Timeline
+##📅 Project Timeline
 
 Week 1 — Dataset & Initial Data Preprocessing
 
 The first week focuses on understanding and preparing the dataset for further machine learning tasks.
 
-Tasks
+##Tasks
 
 - Select and download the healthcare dataset
 - Understand dataset structure and features
@@ -44,7 +44,7 @@ Tasks
 - Perform initial data cleaning
 - Document dataset characteristics
 
-Deliverables
+##Deliverables
 
 - Original dataset
 - Dataset description
