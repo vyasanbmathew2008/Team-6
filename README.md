@@ -29,7 +29,7 @@
 
 ## Project Objectives
 
-- [ ] **Collect & Explore:** Gather and understand the structure of the healthcare dataset.
+- [x] **Collect & Explore:** Gather and understand the structure of the healthcare dataset.
 - [ ] **Systematic Preprocessing:** Build a robust data-cleaning and preprocessing pipeline.
 - [ ] **Model Development:** Train multiple machine-learning algorithms for disease prediction.
 - [ ] **Evaluate & Compare:** Benchmark models using standardized metrics and select the strongest model.
@@ -79,8 +79,8 @@ healthcare-disease-prediction/
 
 #### Tasks
 
-- [ ] Select and download the healthcare dataset
-- [ ] Understand the dataset structure and features
+- [x] Select and download the healthcare dataset
+- [x] Understand the dataset structure and features
 - [ ] Perform exploratory data analysis (EDA)
 - [ ] Identify missing values
 - [ ] Identify duplicate records
