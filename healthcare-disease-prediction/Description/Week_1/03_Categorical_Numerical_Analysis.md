@@ -1,5 +1,5 @@
 
-# Healthcare Disease Prediction — Categorical & Numerical Feature Analysis
+# 3) Categorical & Numerical Feature Analysis
 
 ## Notebook
 
