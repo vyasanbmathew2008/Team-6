@@ -497,7 +497,7 @@ The analysis provides several points that should be considered during later prep
 * The target variable should be checked for class imbalance.
 * Feature-target relationships should be evaluated without assuming that a relationship implies causation.
 
-No final preprocessing decision is made solely from this notebook.
+
 
 ---
 
@@ -515,5 +515,4 @@ The findings from this notebook will support the next stages of the project:
 4. Feature engineering
 5. Machine learning preprocessing
 
-```
-```
+
