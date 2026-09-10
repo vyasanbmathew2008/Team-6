@@ -527,25 +527,8 @@ The notebook calculates:
 
 ---
 
-# 24. Important Note
 
-This notebook is intended for **data inspection and analysis**.
-
-The following operations are intentionally not performed in this notebook:
-
-* Removing duplicate records
-* Dropping irrelevant columns
-* Filling missing values
-* Encoding categorical variables
-* Scaling numerical features
-* Final feature selection
-* Final preprocessing
-
-These operations will be handled in later stages of the project.
-
----
-
-# 25. Conclusion
+# 24. Conclusion
 
 The healthcare dataset was inspected to understand its structure, data types, unique values, and missing-value characteristics.
 
@@ -559,10 +542,3 @@ The results from this notebook provide the foundation for the next stages of the
 
 ---
 
-# Next Week 1 Analysis
-
-**02 — Duplicates & Irrelevant Columns**
-
-[<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab">](https://colab.research.google.com/github/vyasanbmathew2008/Team-6/blob/main/healthcare-disease-prediction/notebooks/Week_1/02_Duplicates_Irrelevant_Columns.ipynb)
-
-[`02_Duplicates_Irrelevant_Columns.ipynb`](../../notebooks/Week_1/02_Duplicates_Irrelevant_Columns.ipynb)
