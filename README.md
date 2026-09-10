@@ -8,7 +8,7 @@ This internship project focuses on developing a Machine Learning-based Healthcar
 
 🔗 Dataset & Data Files
 
-Original Dataset
+<bold>Original Dataset</bold>
 
 The original dataset used for this project can be accessed here:
 
