@@ -15,18 +15,12 @@ The original dataset used for this project can be accessed here:
 Dataset URL:
 "[Original Dataset URL]"
 
-GitHub Dataset (CSV)
-
 The dataset used in the project is available in CSV format on GitHub:
-
-CSV File:
 "[GitHub CSV URL]"
 
 Preprocessed Dataset
 
 The cleaned and preprocessed dataset generated during the project:
-
-Preprocessed Data:
 "[Preprocessed Dataset URL]"
 
 ---
