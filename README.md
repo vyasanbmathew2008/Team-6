@@ -22,7 +22,7 @@
 ## Dataset & Data Files
 
 - **Original Dataset:** [https://huggingface.co/datasets/11andrea2233/healthcare_dataset]
-- **GitHub Dataset (CSV):** [GitHub CSV URL]
+- **GitHub Dataset (CSV):** [https://raw.githubusercontent.com/vyasanbmathew2008/Team-6/refs/heads/main/healthcare_dataset.csv]
 - **Preprocessed Dataset:** [Preprocessed Dataset URL]
 
 ---
