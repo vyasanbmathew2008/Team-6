@@ -53,6 +53,7 @@ healthcare-disease-prediction/
 │   └── preprocessed_data.csv
 │
 ├── notebooks/
+│   │
 │   ├── Week_1/
 │   │   ├── 01_Data_Types_Missing_Values.ipynb
 │   │   ├── 02_Duplicates_Irrelevant_Columns.ipynb
@@ -65,6 +66,21 @@ healthcare-disease-prediction/
 │   │
 │   └── Week_3/
 │       └── week3_evaluation.ipynb
+│
+├── Description/
+│   │
+│   ├── Week_1/
+│   │   ├── 01_Data_Types_Missing_Values.md
+│   │   ├── 02_Duplicates_Irrelevant_Columns.md
+│   │   ├── 03_Categorical_Numerical_Analysis.md
+│   │   ├── 04_Exploratory_Data_Analysis.md
+│   │   └── 05_Initial_Cleaning_Dataset_Documentation.md
+│   │
+│   ├── Week_2/
+│   │   └── week2_modelling.md
+│   │
+│   └── Week_3/
+│       └── week3_evaluation.md
 │
 ├── models/
 │   └── best_model.pkl
@@ -80,7 +96,6 @@ healthcare-disease-prediction/
 ├── requirements.txt
 ├── README.md
 └── LICENSE
-
 ```
 
 ---
