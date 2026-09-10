@@ -44,8 +44,7 @@
 healthcare-disease-prediction/
 │
 ├── dataset/
-│   ├── original_dataset.csv
-│   ├── dataset.csv
+│   ├── healthcare_dataset.csv
 │   └── preprocessed_data.csv
 │
 ├── notebooks/
