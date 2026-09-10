@@ -49,13 +49,22 @@ Project Objectives
 healthcare-disease-prediction/
 │
 ├── dataset/
-│   ├── healthcare_dataset.csv ✅
+│   ├── healthcare_dataset.csv
 │   └── preprocessed_data.csv
 │
 ├── notebooks/
-│   ├── week1_preprocessing.ipynb
-│   ├── week2_modelling.ipynb
-│   └── week3_evaluation.ipynb
+│   ├── Week_1/
+│   │   ├── 01_Data_Types_Missing_Values.ipynb
+│   │   ├── 02_Duplicates_Irrelevant_Columns.ipynb
+│   │   ├── 03_Categorical_Numerical_Analysis.ipynb
+│   │   ├── 04_Exploratory_Data_Analysis.ipynb
+│   │   └── 05_Initial_Cleaning_Dataset_Documentation.ipynb
+│   │
+│   ├── Week_2/
+│   │   └── week2_modelling.ipynb
+│   │
+│   └── Week_3/
+│       └── week3_evaluation.ipynb
 │
 ├── models/
 │   └── best_model.pkl
@@ -71,6 +80,7 @@ healthcare-disease-prediction/
 ├── requirements.txt
 ├── README.md
 └── LICENSE
+
 ```
 
 ---
