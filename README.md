@@ -1,4 +1,4 @@
-Healthcare Disease Prediction using Machine Learning & GenAI
+**Healthcare Disease Prediction using Machine Learning & GenAI**
 
 📌 Project Overview
 
