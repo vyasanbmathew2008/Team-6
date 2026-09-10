@@ -4,7 +4,7 @@
 
 This document provides the documentation for the **Data Types & Missing Value Analysis** performed in Week 1.
 
-📓 **Notebook:** [`01_Data_Types_Missing_Values.ipynb`](../../notebooks/Week_1/01_Data_Types_Missing_Values.ipynb)
+[<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab">](https://colab.research.google.com/github/vyasanbmathew2008/Team-6/blob/main/healthcare-disease-prediction/notebooks/Week_1/01_Data_Types_Missing_Values.ipynb)
 
 ---
 
