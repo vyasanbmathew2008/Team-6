@@ -80,12 +80,12 @@ healthcare-disease-prediction/
 
 - [x] Select and download the healthcare dataset
 - [x] Understand the dataset structure and features
-- [ ] Perform exploratory data analysis (EDA)
+- [ ] Check data types
 - [ ] Identify missing values
 - [ ] Identify duplicate records
-- [ ] Check data types
 - [ ] Identify irrelevant columns
 - [ ] Analyze categorical and numerical features
+- [ ] Perform exploratory data analysis (EDA)
 - [ ] Perform initial data cleaning
 - [ ] Document dataset characteristics
 
