@@ -85,14 +85,11 @@ healthcare-disease-prediction/
 
 - [x] Select and download the healthcare dataset
 - [x] Understand the dataset structure and features
-- [ ] Check data types
-- [ ] Identify missing values
-- [ ] Identify duplicate records
-- [ ] Identify irrelevant columns
+- [ ] Check data types & Identify missing values
+- [ ] Identify duplicate records & irrelevant columns
 - [ ] Analyze categorical and numerical features
 - [ ] Perform exploratory data analysis (EDA)
-- [ ] Perform initial data cleaning
-- [ ] Document dataset characteristics
+- [ ] Perform initial data cleaning & Document dataset characteristics
 
 #### Week 1 Deliverables
 
