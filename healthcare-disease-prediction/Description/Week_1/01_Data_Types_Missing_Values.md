@@ -1,4 +1,4 @@
-# Healthcare Disease Prediction — Data Types & Missing Values
+# 1) Data Types & Missing Values
 
 ## Notebook
 
