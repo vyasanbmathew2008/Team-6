@@ -33,13 +33,13 @@ Project Objectives
 
 - [x] Systematic Preprocessing: Build a robust data-cleaning and preprocessing pipeline, including handling missing values, duplicates, inconsistent text formatting, date conversion, categorical encoding, numerical feature processing, and appropriate feature selection.
 
-- [x] Model Development: Train and compare multiple machine-learning algorithms to predict the patient's "Medical Condition" from relevant healthcare and admission features.
+- [ ] Model Development: Train and compare multiple machine-learning algorithms to predict the patient's "Medical Condition" from relevant healthcare and admission features.
 
-- [x] Evaluate & Compare: Benchmark the trained models using standardized evaluation metrics such as accuracy, precision, recall, F1-score, and confusion matrix, then select the strongest model.
+- [ ] Evaluate & Compare: Benchmark the trained models using standardized evaluation metrics such as accuracy, precision, recall, F1-score, and confusion matrix, then select the strongest model.
 
-- [x] Deployment: Deploy the selected disease-prediction model through a user-friendly Streamlit web application with an appropriate prediction interface.
+- [ ] Deployment: Deploy the selected disease-prediction model through a user-friendly Streamlit web application with an appropriate prediction interface.
 
-- [x] GenAI Enhancement: Integrate the Gemini API to provide user-friendly explanations of the predicted disease, relevant contextual information, and appropriate healthcare recommendations while clearly presenting the output as supportive information rather than a medical diagnosis.
+- [ ] GenAI Enhancement: Integrate the Gemini API to provide user-friendly explanations of the predicted disease, relevant contextual information, and appropriate healthcare recommendations while clearly presenting the output as supportive information rather than a medical diagnosis.
 
 ---
 
@@ -110,11 +110,11 @@ healthcare-disease-prediction/
 
 - [x] Select and download the healthcare dataset
 - [x] Understand the dataset structure and features
-- [ ] Check data types & Identify missing values
-- [ ] Identify duplicate records & irrelevant columns
-- [ ] Analyze categorical and numerical features
-- [ ] Perform exploratory data analysis (EDA)
-- [ ] Perform initial data preprocessing & Document dataset characteristics
+- [x] Check data types & Identify missing values
+- [x] Identify duplicate records & irrelevant columns
+- [x] Analyze categorical and numerical features
+- [x] Perform exploratory data analysis (EDA)
+- [x] Perform initial data preprocessing & Document dataset characteristics
 
 #### Week 1 Deliverables
 
