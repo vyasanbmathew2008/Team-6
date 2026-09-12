@@ -108,25 +108,6 @@ healthcare-disease-prediction/
 
 **Objective:** Understand the healthcare dataset, identify data-quality issues, and produce an initial cleaned version.
 
-#### Tasks
-
-- [x] Select and download the healthcare dataset
-- [x] Understand the dataset structure and features
-- [x] Check data types & Identify missing values
-- [x] Identify duplicate records & irrelevant columns
-- [x] Analyze categorical and numerical features
-- [x] Perform exploratory data analysis (EDA)
-- [x] Perform initial data preprocessing & Document dataset characteristics
-
-#### Week 1 Deliverables
-
-- [ ] Original dataset
-- [ ] Dataset description
-- [ ] Initial EDA report
-- [ ] Initial preprocessing notebook or script
-- [ ] Initial preprocessing documentation
-
-
 ---
 
 ## 📚 Week 1 Notebooks
@@ -139,7 +120,25 @@ healthcare-disease-prediction/
 | **04** | [<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab">](https://colab.research.google.com/github/vyasanbmathew2008/Team-6/blob/main/healthcare-disease-prediction/notebooks/Week_1/04_Exploratory_Data_Analysis.ipynb)                        | [<img src="https://img.shields.io/badge/GitHub-Documentation-181717?logo=github&logoColor=white" alt="GitHub Documentation">](https://github.com/vyasanbmathew2008/Team-6/blob/main/healthcare-disease-prediction/Description/Week_1/04_Exploratory_Data_Analysis.md)                        |
 | **05** | [<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab">](https://colab.research.google.com/github/vyasanbmathew2008/Team-6/blob/main/healthcare-disease-prediction/notebooks/Week_1/05_Initial_Data_Preprocessing_Dataset_Documentation.ipynb) | [<img src="https://img.shields.io/badge/GitHub-Documentation-181717?logo=github&logoColor=white" alt="GitHub Documentation">](https://github.com/vyasanbmathew2008/Team-6/blob/main/healthcare-disease-prediction/Description/Week_1/05_Initial_Data_Preprocessing_Dataset_Documentation.md) |
 
----
+
+
+#### Tasks
+
+- [x] Select and download the healthcare dataset
+- [x] Understand the dataset structure and features
+- [x] Check data types & Identify missing values
+- [x] Identify duplicate records & irrelevant columns
+- [x] Analyze categorical and numerical features
+- [x] Perform exploratory data analysis (EDA)
+- [x] Perform initial data preprocessing & Document dataset characteristics
+
+#### Week 1 Deliverables
+
+- [x] Original dataset
+- [x] Dataset description
+- [x] Initial EDA report
+- [x] Initial preprocessing notebook or script
+- [x] Initial preprocessing documentation
 
 ---
 
