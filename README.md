@@ -52,7 +52,7 @@ healthcare-disease-prediction/
 │
 ├── dataset/
 │   ├── healthcare_dataset.csv
-│   └── preprocessed_data.csv
+│   └── cleaned_data.csv
 │
 ├── notebooks/
 │   │
