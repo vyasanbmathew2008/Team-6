@@ -21,7 +21,7 @@
 
 ## Dataset & Data Files
 
-- **Original Dataset:** [https://huggingface.co/datasets/11andrea2233/healthcare_dataset]
+- **Original Dataset:** [(https://zenodo.org/records/13338116)]
 - **GitHub Dataset (CSV):** [https://github.com/vyasanbmathew2008/Team-6/blob/main/healthcare-disease-prediction/dataset/healthcare_dataset.csv]
 - **Cleaned Dataset:** [[Cleaned Dataset URL](https://raw.githubusercontent.com/vyasanbmathew2008/Team-6/refs/heads/main/healthcare-disease-prediction/dataset/cleaned_data.csv)]
 - **Preprocessed Dataset:** [Link]
