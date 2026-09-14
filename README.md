@@ -23,7 +23,7 @@
 
 - **Original Dataset:** [(https://zenodo.org/records/13338116)]
 - **GitHub Dataset (CSV):** [https://github.com/vyasanbmathew2008/Team-6/blob/main/healthcare-disease-prediction/dataset/healthcare_dataset.csv]
-- **Cleaned Dataset:** [[Cleaned Dataset URL](https://raw.githubusercontent.com/vyasanbmathew2008/Team-6/refs/heads/main/healthcare-disease-prediction/dataset/cleaned_data.csv)]
+- **Cleaned Dataset:** [[Cleaned Dataset URL](https://raw.githubusercontent.com/vyasanbmathew2008/Team-6/refs/heads/main/healthcare-disease-prediction/dataset/cleaned_dataset.csv)]
 - **Preprocessed Dataset:** [Link]
 
 
