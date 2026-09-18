@@ -23,6 +23,11 @@
 
 - **Original Dataset:** [(https://zenodo.org/records/13338116)]
 - **Heart Disease Dataset:** [(https://www.kaggle.com/datasets/oktayrdeki/heart-disease)]
+- **Diabetes Dataset:** [(https://www.kaggle.com/datasets/ankitbatra1210/diabetes-dataset)]
+- **Lung Disease X-Ray Dataset:** [(https://www.kaggle.com/datasets/fatemehmehrparvar/lung-disease?select=Lung+X-Ray+Image)]
+- **Lung Disease Dataset:** [(https://www.kaggle.com/datasets/samikshadalvi/lungs-diseases-dataset)]
+- **Skin Disease Img Dataset:**[(https://www.kaggle.com/datasets/sponishflea/classification-of-skin-diseases)]
+- **Skin Disease Img2 Dataset:**[(https://www.kaggle.com/datasets/pacificrm/skindiseasedataset)]
 - **GitHub Dataset (CSV):** [https://github.com/vyasanbmathew2008/Team-6/blob/main/healthcare-disease-prediction/dataset/healthcare_dataset.csv]
 - **Cleaned Dataset:** [[Cleaned Dataset URL](https://raw.githubusercontent.com/vyasanbmathew2008/Team-6/refs/heads/main/healthcare-disease-prediction/dataset/cleaned_dataset.csv)]
 - **Preprocessed Dataset:** [Link]
