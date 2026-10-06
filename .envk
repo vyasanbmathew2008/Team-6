@@ -1,4 +1,0 @@
-# Gemini GenAI explanation layer
-# Copy this file to .env and replace the placeholder with your key.
-GEMINI_API_KEY=AQ.Ab8RN6J7BDXQWJG8s9aaSoCDOELNxQfh_LZk4r63Otu2OO9Wqg
-GEMINI_MODEL=gemini-3.1-flash-lite
