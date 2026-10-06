@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 import os
 import pickle
+import re
 
 import numpy as np
 import pandas as pd
@@ -27,7 +28,6 @@ load_dotenv(ROOT / ".env")
 
 def get_secret(name: str, default: str = "") -> str:
 
-    # First try Streamlit Secrets
     try:
         value = st.secrets.get(name)
 
@@ -37,7 +37,6 @@ def get_secret(name: str, default: str = "") -> str:
     except Exception:
         pass
 
-    # Then try environment variables / .env
     value = os.getenv(name)
 
     if value:
@@ -74,6 +73,166 @@ st.set_page_config(
     page_icon="🩺",
     layout="wide",
     initial_sidebar_state="expanded",
+)
+
+
+# ============================================================
+# CUSTOM UI STYLE
+# ============================================================
+
+st.markdown(
+    """
+    <style>
+
+    /* -------------------------------------------------------
+       GENERAL
+    ------------------------------------------------------- */
+
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+        max-width: 1200px;
+    }
+
+    /* -------------------------------------------------------
+       GEMINI HEADER
+    ------------------------------------------------------- */
+
+    .ai-header {
+        background: linear-gradient(
+            135deg,
+            rgba(99, 102, 241, 0.12),
+            rgba(59, 130, 246, 0.08)
+        );
+        border: 1px solid rgba(99, 102, 241, 0.20);
+        border-radius: 18px;
+        padding: 22px 24px;
+        margin: 18px 0 20px 0;
+    }
+
+    .ai-header-title {
+        font-size: 1.45rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .ai-header-subtitle {
+        font-size: 0.95rem;
+        opacity: 0.75;
+        line-height: 1.5;
+    }
+
+    /* -------------------------------------------------------
+       INFORMATION CARDS
+    ------------------------------------------------------- */
+
+    .medical-card {
+        border-radius: 18px;
+        padding: 22px;
+        margin-bottom: 18px;
+        border: 1px solid rgba(128, 128, 128, 0.20);
+        background: rgba(128, 128, 128, 0.045);
+        min-height: 150px;
+    }
+
+    .medical-card-title {
+        font-size: 1.12rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .medical-card-content {
+        font-size: 0.96rem;
+        line-height: 1.65;
+    }
+
+    .meaning-card {
+        border-left: 5px solid #6366f1;
+    }
+
+    .why-card {
+        border-left: 5px solid #3b82f6;
+    }
+
+    .next-card {
+        border-left: 5px solid #10b981;
+    }
+
+    .urgent-card {
+        border-left: 5px solid #ef4444;
+    }
+
+    /* -------------------------------------------------------
+       AI DISCLAIMER
+    ------------------------------------------------------- */
+
+    .ai-disclaimer {
+        border-radius: 15px;
+        padding: 17px 20px;
+        margin-top: 20px;
+        border: 1px solid rgba(245, 158, 11, 0.30);
+        background: rgba(245, 158, 11, 0.08);
+        font-size: 0.88rem;
+        line-height: 1.55;
+    }
+
+    /* -------------------------------------------------------
+       RESULT CARD
+    ------------------------------------------------------- */
+
+    .prediction-label {
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        opacity: 0.65;
+        margin-bottom: 5px;
+    }
+
+    .prediction-value {
+        font-size: 1.65rem;
+        font-weight: 750;
+        margin-bottom: 5px;
+    }
+
+    /* -------------------------------------------------------
+       GEMINI STATUS
+    ------------------------------------------------------- */
+
+    .ai-powered {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: rgba(99, 102, 241, 0.12);
+        border: 1px solid rgba(99, 102, 241, 0.20);
+        margin-top: 10px;
+    }
+
+    /* -------------------------------------------------------
+       MOBILE
+    ------------------------------------------------------- */
+
+    @media (max-width: 768px) {
+
+        .block-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .medical-card {
+            padding: 18px;
+        }
+
+        .prediction-value {
+            font-size: 1.35rem;
+        }
+
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
 
 
@@ -250,12 +409,25 @@ def explain_prediction(
 ) -> str:
 
     fallback = (
+        f"### What the prediction means\n\n"
         f"The AI model predicted **{prediction['prediction']}** "
         "based on the information provided.\n\n"
-        "This prediction does not confirm a medical condition. "
-        "A qualified healthcare professional should review the "
-        "result together with symptoms, medical history, and "
-        "appropriate clinical tests."
+
+        "### Why this result may have appeared\n\n"
+        "The prediction is based on the information entered into "
+        "the application. It does not mean that any particular "
+        "factor definitely caused the result.\n\n"
+
+        "### What to do next\n\n"
+        "Consider discussing the result and any symptoms or "
+        "concerns with a qualified healthcare professional.\n\n"
+
+        "### When to seek urgent help\n\n"
+        "If you experience severe, sudden, or rapidly worsening "
+        "symptoms, seek urgent medical attention.\n\n"
+
+        "This is an AI prediction for educational purposes and "
+        "does not replace professional medical evaluation."
     )
 
     # --------------------------------------------------------
@@ -372,6 +544,322 @@ Prediction information:
         )
 
         return fallback
+
+
+# ============================================================
+# GEMINI RESPONSE PARSER
+# ============================================================
+
+def parse_gemini_response(text: str):
+
+    sections = {
+        "What the prediction means": "",
+        "Why this result may have appeared": "",
+        "What to do next": "",
+        "When to seek urgent help": "",
+    }
+
+    if not text:
+        return sections
+
+    # Normalize headings
+    cleaned = text.replace("\r\n", "\n").strip()
+
+    pattern = re.compile(
+        r"###\s*(What the prediction means|"
+        r"Why this result may have appeared|"
+        r"What to do next|"
+        r"When to seek urgent help)"
+        r"\s*\n?",
+        re.IGNORECASE,
+    )
+
+    matches = list(pattern.finditer(cleaned))
+
+    if not matches:
+        sections["What the prediction means"] = cleaned
+        return sections
+
+    for index, match in enumerate(matches):
+
+        heading = match.group(1)
+
+        # Match canonical heading
+        canonical = next(
+            (
+                key
+                for key in sections
+                if key.lower() == heading.lower()
+            ),
+            heading,
+        )
+
+        start = match.end()
+
+        if index + 1 < len(matches):
+            end = matches[index + 1].start()
+        else:
+            end = len(cleaned)
+
+        content = cleaned[start:end].strip()
+
+        sections[canonical] = content
+
+    return sections
+
+
+# ============================================================
+# GEMINI UI RENDERER
+# ============================================================
+
+def render_gemini_response(
+    explanation: str,
+    prediction_label: str,
+    gemini_model: str,
+):
+
+    sections = parse_gemini_response(
+        explanation
+    )
+
+    # --------------------------------------------------------
+    # HEADER
+    # --------------------------------------------------------
+
+    st.markdown(
+        f"""
+        <div class="ai-header">
+
+            <div class="ai-header-title">
+                🤖 AI Health Explanation
+            </div>
+
+            <div class="ai-header-subtitle">
+                A simple explanation of the prediction
+                <strong>{prediction_label}</strong>
+                based on the information provided.
+            </div>
+
+            <div class="ai-powered">
+                ✨ Powered by Gemini · {gemini_model}
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # --------------------------------------------------------
+    # WHAT IT MEANS
+    # --------------------------------------------------------
+
+    meaning = sections[
+        "What the prediction means"
+    ]
+
+    if meaning:
+
+        st.markdown(
+            f"""
+            <div class="medical-card meaning-card">
+
+                <div class="medical-card-title">
+                    🧠 What the prediction means
+                </div>
+
+                <div class="medical-card-content">
+                    {markdown_to_html(meaning)}
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # --------------------------------------------------------
+    # WHY
+    # --------------------------------------------------------
+
+    why = sections[
+        "Why this result may have appeared"
+    ]
+
+    if why:
+
+        st.markdown(
+            f"""
+            <div class="medical-card why-card">
+
+                <div class="medical-card-title">
+                    🔎 Why this result may have appeared
+                </div>
+
+                <div class="medical-card-content">
+                    {markdown_to_html(why)}
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # --------------------------------------------------------
+    # NEXT STEPS
+    # --------------------------------------------------------
+
+    next_steps = sections[
+        "What to do next"
+    ]
+
+    if next_steps:
+
+        st.markdown(
+            f"""
+            <div class="medical-card next-card">
+
+                <div class="medical-card-title">
+                    ✅ What to do next
+                </div>
+
+                <div class="medical-card-content">
+                    {markdown_to_html(next_steps)}
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # --------------------------------------------------------
+    # URGENT HELP
+    # --------------------------------------------------------
+
+    urgent = sections[
+        "When to seek urgent help"
+    ]
+
+    if urgent:
+
+        st.markdown(
+            f"""
+            <div class="medical-card urgent-card">
+
+                <div class="medical-card-title">
+                    🚨 When to seek urgent help
+                </div>
+
+                <div class="medical-card-content">
+                    {markdown_to_html(urgent)}
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # --------------------------------------------------------
+    # DISCLAIMER
+    # --------------------------------------------------------
+
+    st.markdown(
+        """
+        <div class="ai-disclaimer">
+
+            <strong>⚠️ Important medical disclaimer</strong><br><br>
+
+            This result is an AI-generated prediction for
+            educational purposes only. It is not a diagnosis
+            and should not be used as a substitute for a
+            qualified healthcare professional.
+
+            <br><br>
+
+            AI predictions can be incorrect. If you have
+            concerning, severe, sudden, or worsening symptoms,
+            seek appropriate medical care.
+
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ============================================================
+# MARKDOWN → SIMPLE HTML
+# ============================================================
+
+def markdown_to_html(text: str) -> str:
+
+    if not text:
+        return ""
+
+    # Escape HTML-sensitive characters
+    text = (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
+
+    # Bold
+    text = re.sub(
+        r"\*\*(.*?)\*\*",
+        r"<strong>\1</strong>",
+        text,
+    )
+
+    # Italic
+    text = re.sub(
+        r"\*(.*?)\*",
+        r"<em>\1</em>",
+        text,
+    )
+
+    lines = text.split("\n")
+
+    html_lines = []
+
+    for line in lines:
+
+        line = line.strip()
+
+        if not line:
+            continue
+
+        # Bullet points
+        if line.startswith("- "):
+
+            html_lines.append(
+                f"<div style='margin:6px 0 6px 10px;'>"
+                f"• {line[2:]}"
+                f"</div>"
+            )
+
+        elif line.startswith("* "):
+
+            html_lines.append(
+                f"<div style='margin:6px 0 6px 10px;'>"
+                f"• {line[2:]}"
+                f"</div>"
+            )
+
+        # Numbered list
+        elif re.match(r"^\d+\.\s+", line):
+
+            html_lines.append(
+                f"<div style='margin:6px 0 6px 10px;'>"
+                f"{line}"
+                f"</div>"
+            )
+
+        else:
+
+            html_lines.append(
+                f"<div style='margin-bottom:9px;'>"
+                f"{line}"
+                f"</div>"
+            )
+
+    return "".join(html_lines)
 
 
 # ============================================================
@@ -644,25 +1132,16 @@ if submitted:
         # GEMINI
         # ----------------------------------------------------
 
-        st.markdown(
-            "### 🤖 What this result means"
-        )
-
         explanation = explain_prediction(
             result,
             text_context,
             gemini_model,
         )
 
-        st.markdown(
-            explanation
-        )
-
-        st.caption(
-            "Important: An AI prediction can be "
-            "incorrect. If you have symptoms or "
-            "health concerns, consult a qualified "
-            "healthcare professional."
+        render_gemini_response(
+            explanation,
+            result["prediction"],
+            gemini_model,
         )
 
     except Exception as exc:
