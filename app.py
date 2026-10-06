@@ -16,44 +16,17 @@ from google import genai
 # ============================================================
 
 ROOT = Path(__file__).resolve().parent
+
 load_dotenv(ROOT / ".env")
 
 
-# ============================================================
-# GEMINI CONFIGURATION
-# Supports:
-#   1. Local .env
-#   2. Streamlit Cloud Secrets
-# ============================================================
-
-def get_secret(name: str, default: str = "") -> str:
-
-    try:
-        value = st.secrets.get(name)
-
-        if value is not None:
-            return str(value).strip()
-
-    except Exception:
-        pass
-
-    value = os.getenv(name)
-
-    if value:
-        return value.strip()
-
-    return default
-
-
-GEMINI_API_KEY = get_secret("GEMINI_API_KEY")
-
 GEMINI_MODELS = [
     "gemini-2.5-flash",
-    "gemini-2.5-flash-lite",
-    "gemini-3.5-flash",
-    "gemini-3.5-flash-lite",
-    "gemini-3.8-flash",
     "gemini-2.5-pro",
+    "gemini-3-flash-preview",
+    "gemini-3.1-pro-preview",
+    "gemini-3.5-flash",
+    "gemini-3.8-flash",
 ]
 
 
@@ -65,7 +38,7 @@ MODELS = {
 
 
 # ============================================================
-# PAGE CONFIG
+# STREAMLIT PAGE CONFIG
 # ============================================================
 
 st.set_page_config(
@@ -77,157 +50,22 @@ st.set_page_config(
 
 
 # ============================================================
-# CUSTOM UI STYLE
+# GEMINI RESPONSE STYLING
 # ============================================================
 
 st.markdown(
     """
     <style>
 
-    /* -------------------------------------------------------
-       GENERAL
-    ------------------------------------------------------- */
-
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-        max-width: 1200px;
-    }
-
-    /* -------------------------------------------------------
-       GEMINI HEADER
-    ------------------------------------------------------- */
-
-    .ai-header {
-        background: linear-gradient(
-            135deg,
-            rgba(99, 102, 241, 0.12),
-            rgba(59, 130, 246, 0.08)
-        );
-        border: 1px solid rgba(99, 102, 241, 0.20);
-        border-radius: 18px;
-        padding: 22px 24px;
-        margin: 18px 0 20px 0;
-    }
-
-    .ai-header-title {
-        font-size: 1.45rem;
+    .gemini-section-title {
+        font-size: 1.05rem;
         font-weight: 700;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
     }
 
-    .ai-header-subtitle {
-        font-size: 0.95rem;
-        opacity: 0.75;
-        line-height: 1.5;
-    }
-
-    /* -------------------------------------------------------
-       INFORMATION CARDS
-    ------------------------------------------------------- */
-
-    .medical-card {
-        border-radius: 18px;
-        padding: 22px;
-        margin-bottom: 18px;
-        border: 1px solid rgba(128, 128, 128, 0.20);
-        background: rgba(128, 128, 128, 0.045);
-        min-height: 150px;
-    }
-
-    .medical-card-title {
-        font-size: 1.12rem;
-        font-weight: 700;
-        margin-bottom: 12px;
-    }
-
-    .medical-card-content {
-        font-size: 0.96rem;
+    .gemini-section-content {
         line-height: 1.65;
-    }
-
-    .meaning-card {
-        border-left: 5px solid #6366f1;
-    }
-
-    .why-card {
-        border-left: 5px solid #3b82f6;
-    }
-
-    .next-card {
-        border-left: 5px solid #10b981;
-    }
-
-    .urgent-card {
-        border-left: 5px solid #ef4444;
-    }
-
-    /* -------------------------------------------------------
-       AI DISCLAIMER
-    ------------------------------------------------------- */
-
-    .ai-disclaimer {
-        border-radius: 15px;
-        padding: 17px 20px;
-        margin-top: 20px;
-        border: 1px solid rgba(245, 158, 11, 0.30);
-        background: rgba(245, 158, 11, 0.08);
-        font-size: 0.88rem;
-        line-height: 1.55;
-    }
-
-    /* -------------------------------------------------------
-       RESULT CARD
-    ------------------------------------------------------- */
-
-    .prediction-label {
-        font-size: 0.82rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        opacity: 0.65;
-        margin-bottom: 5px;
-    }
-
-    .prediction-value {
-        font-size: 1.65rem;
-        font-weight: 750;
-        margin-bottom: 5px;
-    }
-
-    /* -------------------------------------------------------
-       GEMINI STATUS
-    ------------------------------------------------------- */
-
-    .ai-powered {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        background: rgba(99, 102, 241, 0.12);
-        border: 1px solid rgba(99, 102, 241, 0.20);
-        margin-top: 10px;
-    }
-
-    /* -------------------------------------------------------
-       MOBILE
-    ------------------------------------------------------- */
-
-    @media (max-width: 768px) {
-
-        .block-container {
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-
-        .medical-card {
-            padding: 18px;
-        }
-
-        .prediction-value {
-            font-size: 1.35rem;
-        }
-
+        margin-bottom: 18px;
     }
 
     </style>
@@ -237,40 +75,187 @@ st.markdown(
 
 
 # ============================================================
-# LOAD ML MODEL
+# GEMINI RESPONSE RENDERER
 # ============================================================
 
-@st.cache_resource(show_spinner="Loading the prediction model...")
-def load_model(dataset_label: str):
+def render_gemini_response(response_text: str):
 
-    dataset_stem = MODELS[dataset_label]
+    if not response_text:
+        st.warning(
+            "No explanation was returned by Gemini."
+        )
+        return
+
+    heading_pattern = re.compile(
+        r"(?:^|\n)\s*"
+        r"(?:#{1,6}\s*)?"
+        r"(?:\*\*)?"
+        r"(What it may mean|What to do next|Get emergency help if)"
+        r"(?:\*\*)?"
+        r"\s*:?\s*",
+        re.IGNORECASE,
+    )
+
+    matches = list(
+        heading_pattern.finditer(
+            response_text
+        )
+    )
+
+    # --------------------------------------------------------
+    # Use Streamlit's actual bordered container
+    # --------------------------------------------------------
+
+    with st.container(border=True):
+
+        # ----------------------------------------------------
+        # If Gemini didn't return the expected sections
+        # ----------------------------------------------------
+
+        if not matches:
+
+            st.markdown(
+                response_text
+            )
+
+            return
+
+        sections = []
+
+        for index, match in enumerate(matches):
+
+            heading = match.group(1).strip()
+
+            start = match.end()
+
+            if index + 1 < len(matches):
+
+                end = matches[
+                    index + 1
+                ].start()
+
+            else:
+
+                end = len(
+                    response_text
+                )
+
+            content = response_text[
+                start:end
+            ].strip()
+
+            content = re.sub(
+                r"^\s*[:\-]\s*",
+                "",
+                content,
+            ).strip()
+
+            sections.append(
+                {
+                    "heading": heading,
+                    "content": content,
+                }
+            )
+
+        icons = {
+            "What it may mean": "📌",
+            "What to do next": "➡️",
+            "Get emergency help if": "🚨",
+        }
+
+        # ----------------------------------------------------
+        # Render each section
+        # ----------------------------------------------------
+
+        for index, section in enumerate(
+            sections
+        ):
+
+            heading = section[
+                "heading"
+            ]
+
+            content = section[
+                "content"
+            ]
+
+            icon = icons.get(
+                heading,
+                "•",
+            )
+
+            st.markdown(
+                f"**{icon} {heading}**"
+            )
+
+            st.markdown(
+                content
+            )
+
+            if index < len(sections) - 1:
+
+                st.divider()
+
+
+# ============================================================
+# LOAD MODEL
+# ============================================================
+
+@st.cache_resource(
+    show_spinner="Loading the prediction model..."
+)
+def load_model(
+    dataset_label: str
+):
+
+    dataset_stem = MODELS[
+        dataset_label
+    ]
 
     model_dir = ROOT / "models"
-    model_path = model_dir / f"{dataset_stem}.pkl"
+
+    model_path = (
+        model_dir
+        / f"{dataset_stem}.pkl"
+    )
 
     if not model_path.exists():
+
         raise FileNotFoundError(
-            "No pickle model was found. Run train.py first so it creates "
+            "No pickle model was found. "
+            "Run train.py first so it creates "
             f"{model_path}"
         )
 
     with model_path.open("rb") as handle:
-        bundle = pickle.load(handle)
+
+        bundle = pickle.load(
+            handle
+        )
 
     if (
-        not isinstance(bundle, dict)
+        not isinstance(
+            bundle,
+            dict,
+        )
         or "pipeline" not in bundle
         or "feature_schema" not in bundle
     ):
+
         raise ValueError(
-            "The pickle file does not contain the expected model bundle. "
-            "Please retrain the selected model with train.py."
+            "The pickle file does not contain "
+            "the expected model bundle. "
+            "Please retrain the selected model "
+            "with train.py."
         )
 
     return {
         **bundle,
         "model_path": model_path,
-        "scores": bundle.get("scores", {}),
+        "scores": bundle.get(
+            "scores",
+            {},
+        ),
     }
 
 
@@ -278,59 +263,102 @@ def load_model(dataset_label: str):
 # INPUT FORM
 # ============================================================
 
-def make_input_form(model_info: dict):
+def make_input_form(
+    model_info: dict
+):
 
     values = {}
 
-    feature_schema = model_info["feature_schema"]
-    columns = model_info["columns"]
+    feature_schema = (
+        model_info[
+            "feature_schema"
+        ]
+    )
+
+    columns = model_info[
+        "columns"
+    ]
 
     # --------------------------------------------------------
-    # INFECTIOUS DISEASE
+    # HEALTH / SYMPTOM DATASET
     # --------------------------------------------------------
 
-    if model_info.get("dataset_name") == "health_dataset":
+    if (
+        model_info.get(
+            "dataset_name"
+        )
+        == "health_dataset"
+    ):
 
-        st.subheader("Enter symptoms")
-
-        st.caption(
-            "Select the symptoms that best match the user input. "
-            "The health model maps them to a predicted disease."
+        st.subheader(
+            "Enter symptoms"
         )
 
-        symptom_options = sorted({
-            option
-            for column in columns
-            for option in feature_schema.get(column, {}).get(
-                "options", []
-            )
-            if option
-        })
+        st.caption(
+            "Select the symptoms that best match "
+            "the user input. The health model maps "
+            "them to a predicted disease."
+        )
+
+        symptom_options = sorted(
+            {
+                option
+                for column in columns
+                for option in feature_schema.get(
+                    column,
+                    {},
+                ).get(
+                    "options",
+                    [],
+                )
+                if option
+            }
+        )
 
         selected = st.multiselect(
             "Symptoms from the dataset",
             symptom_options,
-            max_selections=len(columns),
-            placeholder="Choose one or more symptoms",
+            max_selections=len(
+                columns
+            ),
+            placeholder=(
+                "Choose one or more symptoms"
+            ),
         )
 
         typed = st.text_area(
             "Enter symptoms manually",
-            placeholder="Example: fever, cough, fatigue",
-            help="Separate multiple symptoms with commas.",
+            placeholder=(
+                "Example: fever, cough, fatigue"
+            ),
+            help=(
+                "Separate multiple symptoms with commas. "
+                "Known symptoms are used as model features; "
+                "unknown text is still passed safely through "
+                "the pipeline."
+            ),
         )
 
         typed_symptoms = [
             item.strip()
-            for item in typed.split(",")
+            for item in typed.split(
+                ","
+            )
             if item.strip()
         ]
 
         selected = list(
-            dict.fromkeys(selected + typed_symptoms)
-        )[:len(columns)]
+            dict.fromkeys(
+                selected
+                + typed_symptoms
+            )
+        )[
+            :len(columns)
+        ]
 
-        for index, column in enumerate(columns):
+        for index, column in enumerate(
+            columns
+        ):
 
             values[column] = (
                 selected[index]
@@ -341,58 +369,94 @@ def make_input_form(model_info: dict):
         return values
 
     # --------------------------------------------------------
-    # OTHER HEALTH MODELS
+    # NORMAL DATASET
     # --------------------------------------------------------
 
-    st.subheader("Your information")
-
-    st.caption(
-        "Enter the information below to receive an AI-assisted "
-        "health prediction."
+    st.subheader(
+        "Your information"
     )
 
-    for index, column in enumerate(columns):
+    st.caption(
+        "Enter the information below to receive "
+        "an AI-assisted health prediction."
+    )
 
-        info = feature_schema[column]
-        label = str(column)
+    for index, column in enumerate(
+        columns
+    ):
+
+        info = feature_schema[
+            column
+        ]
+
+        label = str(
+            column
+        )
 
         if info["kind"] == "numeric":
 
-            minimum = float(info["min"])
-            maximum = float(info["max"])
-            default = float(info["default"])
+            minimum = float(
+                info["min"]
+            )
 
-            if not np.isfinite(minimum):
+            maximum = float(
+                info["max"]
+            )
+
+            default = float(
+                info["default"]
+            )
+
+            if not np.isfinite(
+                minimum
+            ):
+
                 minimum = -1e6
 
-            if not np.isfinite(maximum):
+            if not np.isfinite(
+                maximum
+            ):
+
                 maximum = 1e6
 
             if minimum == maximum:
-                maximum = minimum + 1.0
 
-            values[column] = st.number_input(
-                label,
-                min_value=minimum,
-                max_value=maximum,
-                value=min(
-                    max(default, minimum),
-                    maximum,
-                ),
-                key=f"field_{index}",
+                maximum = (
+                    minimum + 1.0
+                )
+
+            values[column] = (
+                st.number_input(
+                    label,
+                    min_value=minimum,
+                    max_value=maximum,
+                    value=min(
+                        max(
+                            default,
+                            minimum,
+                        ),
+                        maximum,
+                    ),
+                    key=f"field_{index}",
+                )
             )
 
         else:
 
             options = (
-                info.get("options", [""])
+                info.get(
+                    "options",
+                    [""],
+                )
                 or [""]
             )
 
-            values[column] = st.selectbox(
-                label,
-                options,
-                key=f"field_{index}",
+            values[column] = (
+                st.selectbox(
+                    label,
+                    options,
+                    key=f"field_{index}",
+                )
             )
 
     return values
@@ -409,478 +473,143 @@ def explain_prediction(
 ) -> str:
 
     fallback = (
-        f"### What the prediction means\n\n"
-        f"The AI model predicted **{prediction['prediction']}** "
-        "based on the information provided.\n\n"
-
-        "### Why this result may have appeared\n\n"
-        "The prediction is based on the information entered into "
-        "the application. It does not mean that any particular "
-        "factor definitely caused the result.\n\n"
-
-        "### What to do next\n\n"
-        "Consider discussing the result and any symptoms or "
-        "concerns with a qualified healthcare professional.\n\n"
-
-        "### When to seek urgent help\n\n"
-        "If you experience severe, sudden, or rapidly worsening "
-        "symptoms, seek urgent medical attention.\n\n"
-
-        "This is an AI prediction for educational purposes and "
-        "does not replace professional medical evaluation."
+        f"{prediction['prediction']} is the condition "
+        "the AI system identified from the information "
+        "provided. This result is only an AI-based "
+        "prediction, not a medical diagnosis, and should "
+        "be reviewed by a qualified healthcare professional."
     )
 
-    # --------------------------------------------------------
-    # CHECK API KEY
-    # --------------------------------------------------------
+    api_key = os.getenv(
+        "GEMINI_API_KEY"
+    )
 
-    if not GEMINI_API_KEY:
-
-        st.warning(
-            "GEMINI_API_KEY was not found. "
-            "Please add it to Streamlit Secrets."
-        )
+    if not api_key:
 
         return fallback
-
-    # --------------------------------------------------------
-    # GEMINI
-    # --------------------------------------------------------
 
     try:
 
         client = genai.Client(
-            api_key=GEMINI_API_KEY
+            api_key=api_key
         )
 
         request = {
-            "health_area": prediction["dataset"],
-            "prediction": prediction["prediction"],
-            "confidence": prediction.get("confidence"),
-            "input_values": prediction.get(
-                "input_values",
-                {},
-            ),
-            "additional_information": text_context[:2000],
+            "prediction": prediction,
+            "user_context": text_context[
+                :2000
+            ],
         }
 
-        prompt = f"""
-You are a healthcare information assistant inside an
-educational AI health-prediction application.
+        prompt = (
+            "Give a practical, patient-friendly "
+            "next-step guide for the predicted "
+            "health condition. "
 
-A machine-learning system has produced the prediction below.
+            "Return 3 short sections with these "
+            "labels exactly: "
+            "What it may mean, What to do next, "
+            "Get emergency help if. "
 
-Explain the prediction in simple, patient-friendly language.
+            "In 'What it may mean', briefly explain "
+            "the condition without claiming the person "
+            "has it. "
 
-IMPORTANT RULES:
+            "In 'What to do next', explain an appropriate "
+            "level of follow-up such as routine doctor/clinic "
+            "review, prompt medical assessment, or urgent "
+            "assessment when appropriate. "
 
-- The prediction is NOT a confirmed diagnosis.
-- Never say the user definitely has the condition.
-- Do not prescribe medication.
-- Do not provide medication doses.
-- Do not invent symptoms or patient information.
-- Do not mention datasets, pickle files, algorithms,
-  pipelines, backend code, or software implementation.
-- Use only the information provided.
-- Model confidence is NOT medical certainty.
-- Explain that the prediction can be incorrect.
+            "Do not tell someone to be admitted to a hospital "
+            "solely because of this AI prediction. "
 
-Return exactly these sections:
+            "In 'Get emergency help if', list important "
+            "red-flag symptoms that warrant emergency care "
+            "for the predicted condition. "
 
-### What the prediction means
+            "For heart-related predictions, include severe "
+            "or persistent chest pressure/pain, severe "
+            "shortness of breath, fainting, or pain spreading "
+            "to the arm, jaw, neck or back. "
 
-Explain what the predicted condition generally means
-and what this prediction indicates.
+            "For lung-related predictions, include severe "
+            "difficulty breathing, blue/grey lips or skin, "
+            "coughing blood, or severe chest pain. "
 
-### Why this result may have appeared
+            "For other conditions, give only broadly "
+            "recognized emergency warning signs relevant "
+            "to that condition. "
 
-Briefly explain relevant information supplied by the user
-that may be associated with the prediction.
+            "Do NOT mention the algorithm, model type, "
+            "dataset, pickle file, feature names, backend, "
+            "or technical implementation. "
 
-Do not claim that a particular factor definitely caused
-the prediction.
+            "Do not diagnose, claim certainty, prescribe "
+            "medicines, recommend a specific dose, or invent "
+            "patient-specific facts. "
 
-### What to do next
+            "Make clear that the prediction can be wrong "
+            "and that a healthcare professional must assess "
+            "symptoms and confirm any diagnosis. "
 
-Give sensible general next steps and recommend appropriate
-medical follow-up when relevant.
-
-### When to seek urgent help
-
-Mention important emergency warning signs relevant to the
-predicted condition.
-
-If there are no obvious emergency warning signs,
-say that clearly.
-
-Finish with a short statement that this is an AI prediction
-for educational purposes and does not replace professional
-medical evaluation.
-
-Prediction information:
-
-{json.dumps(request, default=str, indent=2)}
-"""
-
-        response = client.models.generate_content(
-            model=gemini_model,
-            contents=prompt,
+            "Use clear language suitable for a general patient."
+            "\n\n"
+            + json.dumps(
+                request,
+                default=str,
+            )
         )
 
-        if response is None or not response.text:
-
-            st.error(
-                "Gemini returned an empty response."
+        response = (
+            client.models.generate_content(
+                model=gemini_model,
+                contents=prompt,
             )
+        )
 
-            return fallback
+        if (
+            not response
+            or not response.text
+        ):
+
+            return (
+                "Gemini did not return an explanation. "
+                "Please try again."
+            )
 
         return response.text
 
-    except Exception as exc:
+    except Exception:
 
-        st.error(
-            f"Gemini API error: {type(exc).__name__}: {exc}"
+        return (
+            "Gemini explanation is currently unavailable. "
+            "Check your Gemini API key and selected model, "
+            "then try again."
         )
 
-        return fallback
-
 
 # ============================================================
-# GEMINI RESPONSE PARSER
+# PAGE HEADER
 # ============================================================
 
-def parse_gemini_response(text: str):
-
-    sections = {
-        "What the prediction means": "",
-        "Why this result may have appeared": "",
-        "What to do next": "",
-        "When to seek urgent help": "",
-    }
-
-    if not text:
-        return sections
-
-    # Normalize headings
-    cleaned = text.replace("\r\n", "\n").strip()
-
-    pattern = re.compile(
-        r"###\s*(What the prediction means|"
-        r"Why this result may have appeared|"
-        r"What to do next|"
-        r"When to seek urgent help)"
-        r"\s*\n?",
-        re.IGNORECASE,
-    )
-
-    matches = list(pattern.finditer(cleaned))
-
-    if not matches:
-        sections["What the prediction means"] = cleaned
-        return sections
-
-    for index, match in enumerate(matches):
-
-        heading = match.group(1)
-
-        # Match canonical heading
-        canonical = next(
-            (
-                key
-                for key in sections
-                if key.lower() == heading.lower()
-            ),
-            heading,
-        )
-
-        start = match.end()
-
-        if index + 1 < len(matches):
-            end = matches[index + 1].start()
-        else:
-            end = len(cleaned)
-
-        content = cleaned[start:end].strip()
-
-        sections[canonical] = content
-
-    return sections
-
-
-# ============================================================
-# GEMINI UI RENDERER
-# ============================================================
-
-def render_gemini_response(
-    explanation: str,
-    prediction_label: str,
-    gemini_model: str,
-):
-
-    sections = parse_gemini_response(
-        explanation
-    )
-
-    # --------------------------------------------------------
-    # HEADER
-    # --------------------------------------------------------
-
-    st.markdown(
-        f"""
-        <div class="ai-header">
-
-            <div class="ai-header-title">
-                🤖 AI Health Explanation
-            </div>
-
-            <div class="ai-header-subtitle">
-                A simple explanation of the prediction
-                <strong>{prediction_label}</strong>
-                based on the information provided.
-            </div>
-
-            <div class="ai-powered">
-                ✨ Powered by Gemini · {gemini_model}
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # --------------------------------------------------------
-    # WHAT IT MEANS
-    # --------------------------------------------------------
-
-    meaning = sections[
-        "What the prediction means"
-    ]
-
-    if meaning:
-
-        st.markdown(
-            f"""
-            <div class="medical-card meaning-card">
-
-                <div class="medical-card-title">
-                    🧠 What the prediction means
-                </div>
-
-                <div class="medical-card-content">
-                    {markdown_to_html(meaning)}
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    # --------------------------------------------------------
-    # WHY
-    # --------------------------------------------------------
-
-    why = sections[
-        "Why this result may have appeared"
-    ]
-
-    if why:
-
-        st.markdown(
-            f"""
-            <div class="medical-card why-card">
-
-                <div class="medical-card-title">
-                    🔎 Why this result may have appeared
-                </div>
-
-                <div class="medical-card-content">
-                    {markdown_to_html(why)}
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    # --------------------------------------------------------
-    # NEXT STEPS
-    # --------------------------------------------------------
-
-    next_steps = sections[
-        "What to do next"
-    ]
-
-    if next_steps:
-
-        st.markdown(
-            f"""
-            <div class="medical-card next-card">
-
-                <div class="medical-card-title">
-                    ✅ What to do next
-                </div>
-
-                <div class="medical-card-content">
-                    {markdown_to_html(next_steps)}
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    # --------------------------------------------------------
-    # URGENT HELP
-    # --------------------------------------------------------
-
-    urgent = sections[
-        "When to seek urgent help"
-    ]
-
-    if urgent:
-
-        st.markdown(
-            f"""
-            <div class="medical-card urgent-card">
-
-                <div class="medical-card-title">
-                    🚨 When to seek urgent help
-                </div>
-
-                <div class="medical-card-content">
-                    {markdown_to_html(urgent)}
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    # --------------------------------------------------------
-    # DISCLAIMER
-    # --------------------------------------------------------
-
-    st.markdown(
-        """
-        <div class="ai-disclaimer">
-
-            <strong>⚠️ Important medical disclaimer</strong><br><br>
-
-            This result is an AI-generated prediction for
-            educational purposes only. It is not a diagnosis
-            and should not be used as a substitute for a
-            qualified healthcare professional.
-
-            <br><br>
-
-            AI predictions can be incorrect. If you have
-            concerning, severe, sudden, or worsening symptoms,
-            seek appropriate medical care.
-
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-# ============================================================
-# MARKDOWN → SIMPLE HTML
-# ============================================================
-
-def markdown_to_html(text: str) -> str:
-
-    if not text:
-        return ""
-
-    # Escape HTML-sensitive characters
-    text = (
-        text.replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-    )
-
-    # Bold
-    text = re.sub(
-        r"\*\*(.*?)\*\*",
-        r"<strong>\1</strong>",
-        text,
-    )
-
-    # Italic
-    text = re.sub(
-        r"\*(.*?)\*",
-        r"<em>\1</em>",
-        text,
-    )
-
-    lines = text.split("\n")
-
-    html_lines = []
-
-    for line in lines:
-
-        line = line.strip()
-
-        if not line:
-            continue
-
-        # Bullet points
-        if line.startswith("- "):
-
-            html_lines.append(
-                f"<div style='margin:6px 0 6px 10px;'>"
-                f"• {line[2:]}"
-                f"</div>"
-            )
-
-        elif line.startswith("* "):
-
-            html_lines.append(
-                f"<div style='margin:6px 0 6px 10px;'>"
-                f"• {line[2:]}"
-                f"</div>"
-            )
-
-        # Numbered list
-        elif re.match(r"^\d+\.\s+", line):
-
-            html_lines.append(
-                f"<div style='margin:6px 0 6px 10px;'>"
-                f"{line}"
-                f"</div>"
-            )
-
-        else:
-
-            html_lines.append(
-                f"<div style='margin-bottom:9px;'>"
-                f"{line}"
-                f"</div>"
-            )
-
-    return "".join(html_lines)
-
-
-# ============================================================
-# HEADER
-# ============================================================
-
-st.title("🩺 Medical AI Predictor")
+st.title(
+    "🩺 Medical AI Predictor"
+)
 
 st.markdown(
     "### Understand your health information with AI"
 )
 
 st.write(
-    "Provide the requested information and receive an "
-    "AI-assisted prediction with a clear, easy-to-understand "
-    "explanation."
+    "Provide the requested information and receive "
+    "an AI-assisted prediction with a clear, "
+    "easy-to-understand explanation."
 )
 
 st.info(
-    "For educational use only. This tool does not replace "
-    "a medical examination, professional advice, or diagnosis."
+    "For educational use only. This tool does not "
+    "replace a medical examination, professional "
+    "advice, or diagnosis."
 )
 
 
@@ -890,7 +619,9 @@ st.info(
 
 with st.sidebar:
 
-    st.header("Prediction settings")
+    st.header(
+        "Prediction settings"
+    )
 
     selected_dataset = st.selectbox(
         "Health area",
@@ -900,13 +631,19 @@ with st.sidebar:
 
     st.divider()
 
-    configured_model = get_secret(
+    configured_model = os.getenv(
         "GEMINI_MODEL",
-        "gemini-2.5-flash",
+        "gemini-3.5-flash",
     )
 
-    if configured_model not in GEMINI_MODELS:
-        configured_model = "gemini-2.5-flash"
+    if (
+        configured_model
+        not in GEMINI_MODELS
+    ):
+
+        configured_model = (
+            "gemini-3.5-flash"
+        )
 
     gemini_choice = st.selectbox(
         "Gemini model",
@@ -916,27 +653,47 @@ with st.sidebar:
             "Custom model ID",
         ],
         index=0,
+        help=(
+            "Choose the Gemini model used "
+            "for the prediction explanation."
+        ),
     )
 
-    if gemini_choice == "Custom model ID":
+    if (
+        gemini_choice
+        == "Custom model ID"
+    ):
 
         gemini_model = st.text_input(
             "Custom Gemini model ID",
             value=configured_model,
-            placeholder="Example: gemini-2.5-flash",
+            placeholder=(
+                "Example: gemini-2.5-flash"
+            ),
+            help=(
+                "Enter a model ID supported "
+                "by your Gemini API account."
+            ),
         ).strip() or configured_model
 
-    elif gemini_choice == "Default / configured":
+    elif (
+        gemini_choice
+        == "Default / configured"
+    ):
 
-        gemini_model = configured_model
+        gemini_model = (
+            configured_model
+        )
 
     else:
 
-        gemini_model = gemini_choice
+        gemini_model = (
+            gemini_choice
+        )
 
 
 # ============================================================
-# LOAD MODEL
+# LOAD SELECTED MODEL
 # ============================================================
 
 try:
@@ -947,15 +704,20 @@ try:
 
 except Exception as exc:
 
-    st.error(str(exc))
+    st.error(
+        str(exc)
+    )
+
     st.stop()
 
 
 # ============================================================
-# FORM
+# PREDICTION FORM
 # ============================================================
 
-with st.form("prediction_form"):
+with st.form(
+    "prediction_form"
+):
 
     record = make_input_form(
         model_info
@@ -964,191 +726,227 @@ with st.form("prediction_form"):
     text_context = st.text_area(
         "Additional information (optional)",
         placeholder=(
-            "Add any non-identifying information you "
-            "would like the AI to consider."
+            "Add any non-identifying information "
+            "you would like the AI to consider "
+            "for the explanation."
         ),
     )
 
-    submitted = st.form_submit_button(
-        "🔍 Check prediction",
-        use_container_width=True,
+    submitted = (
+        st.form_submit_button(
+            "🔍 Check prediction",
+            use_container_width=True,
+        )
     )
 
 
 # ============================================================
-# PREDICTION
+# PROCESS PREDICTION
 # ============================================================
 
 if submitted:
 
-    try:
+    row = pd.DataFrame(
+        [record],
+        columns=model_info[
+            "columns"
+        ],
+    )
 
-        row = pd.DataFrame(
-            [record],
-            columns=model_info["columns"],
+    pipeline = model_info[
+        "pipeline"
+    ]
+
+    label = pipeline.predict(
+        row
+    )[0]
+
+    result = {
+        "dataset": selected_dataset,
+        "prediction": str(
+            label
+        ),
+        "model": model_info[
+            "model_name"
+        ],
+        "target": model_info[
+            "target"
+        ],
+        "model_file": model_info[
+            "model_path"
+        ].name,
+    }
+
+    # --------------------------------------------------------
+    # Symptoms
+    # --------------------------------------------------------
+
+    if (
+        model_info.get(
+            "dataset_name"
         )
+        == "health_dataset"
+    ):
 
-        pipeline = model_info["pipeline"]
+        result[
+            "input_symptoms"
+        ] = [
+            str(value)
+            for value in record.values()
+            if pd.notna(value)
+            and str(value).strip()
+        ]
 
-        label = pipeline.predict(row)[0]
+    # --------------------------------------------------------
+    # Prediction probabilities
+    # --------------------------------------------------------
 
-        result = {
-            "dataset": selected_dataset,
-            "prediction": str(label),
-            "model": model_info["model_name"],
-            "target": model_info["target"],
-            "model_file": model_info[
-                "model_path"
-            ].name,
-            "input_values": {
-                str(key): str(value)
-                for key, value in record.items()
-                if pd.notna(value)
-            },
-        }
+    if hasattr(
+        pipeline,
+        "predict_proba",
+    ):
 
-        # ----------------------------------------------------
-        # SYMPTOMS
-        # ----------------------------------------------------
-
-        if (
-            model_info.get("dataset_name")
-            == "health_dataset"
-        ):
-
-            result["input_symptoms"] = [
-                str(value)
-                for value in record.values()
-                if (
-                    pd.notna(value)
-                    and str(value).strip()
-                )
-            ]
-
-        # ----------------------------------------------------
-        # CONFIDENCE
-        # ----------------------------------------------------
-
-        if hasattr(
-            pipeline,
-            "predict_proba",
-        ):
-
-            probabilities = pipeline.predict_proba(
+        probabilities = (
+            pipeline.predict_proba(
                 row
             )[0]
+        )
 
-            result["confidence"] = round(
-                float(np.max(probabilities)),
+        result[
+            "confidence"
+        ] = round(
+            float(
+                np.max(
+                    probabilities
+                )
+            ),
+            4,
+        )
+
+        result[
+            "class_probabilities"
+        ] = {
+            str(cls): round(
+                float(prob),
                 4,
             )
+            for cls, prob in zip(
+                pipeline.classes_,
+                probabilities,
+            )
+        }
 
-            result["class_probabilities"] = {
-                str(cls): round(
-                    float(prob),
-                    4,
-                )
-                for cls, prob in zip(
-                    pipeline.classes_,
-                    probabilities,
-                )
-            }
+    # ========================================================
+    # RESULT
+    # ========================================================
 
-        # ----------------------------------------------------
-        # RESULT
-        # ----------------------------------------------------
+    st.divider()
 
-        st.divider()
+    st.markdown(
+        "## 🧪 Your result"
+    )
 
-        st.markdown(
-            "## 🧪 Your result"
-        )
-
-        result_col1, result_col2 = st.columns(
+    result_col1, result_col2 = (
+        st.columns(
             [2.5, 1]
         )
+    )
 
-        with result_col1:
+    with result_col1:
 
-            st.success(
-                f"### {result['prediction']}"
+        st.success(
+            f"### {result['prediction']}"
+        )
+
+        st.caption(
+            "This is the condition identified "
+            "by the AI from the information provided."
+        )
+
+    with result_col2:
+
+        confidence = result.get(
+            "confidence"
+        )
+
+        if confidence is not None:
+
+            st.metric(
+                "Prediction confidence",
+                f"{confidence:.1%}",
             )
 
-            st.caption(
-                "This is an AI-generated prediction "
-                "based on the information provided."
-            )
+    # ========================================================
+    # PREDICTION OVERVIEW
+    # ========================================================
 
-        with result_col2:
+    if result.get(
+        "class_probabilities"
+    ):
 
-            confidence = result.get(
-                "confidence"
-            )
+        st.markdown(
+            "#### Prediction overview"
+        )
 
-            if confidence is not None:
-
-                st.metric(
-                    "Prediction confidence",
-                    f"{confidence:.1%}",
-                )
-
-        # ----------------------------------------------------
-        # PROBABILITIES
-        # ----------------------------------------------------
-
-        if result.get(
-            "class_probabilities"
-        ):
-
-            st.markdown(
-                "#### Prediction overview"
-            )
-
-            probability_cols = st.columns(
+        probability_cols = (
+            st.columns(
                 len(
                     result[
                         "class_probabilities"
                     ]
                 )
             )
+        )
 
-            for index, (
-                class_name,
-                probability,
-            ) in enumerate(
-                result[
-                    "class_probabilities"
-                ].items()
-            ):
+        for index, (
+            class_name,
+            probability,
+        ) in enumerate(
+            result[
+                "class_probabilities"
+            ].items()
+        ):
 
-                with probability_cols[index]:
+            with probability_cols[
+                index
+            ]:
 
-                    st.metric(
-                        class_name,
-                        f"{probability:.1%}",
-                    )
+                st.metric(
+                    class_name,
+                    f"{probability:.1%}",
+                )
 
-        # ----------------------------------------------------
-        # GEMINI
-        # ----------------------------------------------------
+    # ========================================================
+    # AI HEALTH GUIDANCE
+    # ========================================================
 
-        explanation = explain_prediction(
+    st.markdown(
+        "### 🤖 AI Health Guidance"
+    )
+
+    explanation = (
+        explain_prediction(
             result,
             text_context,
             gemini_model,
         )
+    )
 
-        render_gemini_response(
-            explanation,
-            result["prediction"],
-            gemini_model,
-        )
+    render_gemini_response(
+        explanation
+    )
 
-    except Exception as exc:
+    st.caption(
+        "Important: This AI-generated information "
+        "is for educational purposes only. It is not "
+        "a medical diagnosis. If you have symptoms or "
+        "health concerns, consult a qualified healthcare "
+        "professional."
+    )
 
-        st.error(
-            f"Prediction error: {type(exc).__name__}: {exc}"
-        )
 
+# ============================================================
+# FOOTER
+# ============================================================
 
 st.divider()
